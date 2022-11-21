@@ -127,26 +127,32 @@ namespace Monitorian.Core.Models.Monitor
 				{
 					foreach (var physicalItem in physicalItems)
 					{
-						int index = -1;
-						if (physicalItem.Capability.IsBrightnessSupported ||
-							_preclearedIds.Value.Any())
+						int index = basicItems.FindIndex(x =>
+									!x.IsInternal &&
+									(x.DisplayIndex == handleItem.DisplayIndex) &&
+									(x.MonitorIndex == physicalItem.MonitorIndex) &&
+									string.Equals(x.Description, physicalItem.Description, StringComparison.OrdinalIgnoreCase)); ;
+
+						// Added ASM-160QCC support
+						bool IsBrightnessSupported = false;
+						if (basicItems[index].AlternateDescription == "ASM-160QCC")
 						{
-							index = basicItems.FindIndex(x =>
-								!x.IsInternal &&
-								(x.DisplayIndex == handleItem.DisplayIndex) &&
-								(x.MonitorIndex == physicalItem.MonitorIndex) &&
-								string.Equals(x.Description, physicalItem.Description, StringComparison.OrdinalIgnoreCase));
+							IsBrightnessSupported = true;
 						}
-						if (index < 0)
+						else
 						{
-							physicalItem.Handle.Dispose();
-							continue;
+							if (!(physicalItem.Capability.IsBrightnessSupported ||
+							_preclearedIds.Value.Any()))
+							{
+								physicalItem.Handle.Dispose();
+								continue;
+							}
 						}
 
 						var basicItem = basicItems[index];
 
 						MonitorCapability capability = null;
-						if (physicalItem.Capability.IsBrightnessSupported)
+						if (physicalItem.Capability.IsBrightnessSupported || IsBrightnessSupported)
 						{
 							capability = physicalItem.Capability;
 						}
