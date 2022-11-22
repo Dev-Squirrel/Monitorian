@@ -141,12 +141,16 @@ namespace Monitorian.Core.Models.Monitor
 						}
 						else
 						{
-							if (!(physicalItem.Capability.IsBrightnessSupported ||
-							_preclearedIds.Value.Any()))
-							{
-								physicalItem.Handle.Dispose();
-								continue;
-							}
+							//if (!(physicalItem.Capability.IsBrightnessSupported ||
+							//_preclearedIds.Value.Any()))
+							//{
+							//	physicalItem.Handle.Dispose();
+							//	continue;
+							//}
+
+							// Only ASM-160QCC support
+							physicalItem.Handle.Dispose();
+							continue;
 						}
 
 						var basicItem = basicItems[index];
